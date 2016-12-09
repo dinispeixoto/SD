@@ -5,6 +5,8 @@
  */
 package sdtrabalho;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Marcelo
@@ -13,23 +15,25 @@ public class Leilao {
     private String descricao;
     private double licAtual;
     private Vendedor iniciador;
+    private ArrayList<Comprador> licitadores;
     
     public Leilao(){
-        this("",0,null);
+        this("",null);
+        this.licitadores = new ArrayList<>();
     }
 
     
     public Leilao(Leilao l){
         this.descricao = l.getDescricao();
-        this.licAtual = l.getLicAtual();
         this.iniciador = l.getIniciador();
+        this.licitadores = new ArrayList<>();
     }
 
 
-    public Leilao(String descricao, double licAtual, Vendedor iniciador){
+    public Leilao(String descricao,Vendedor iniciador){
         this.descricao = descricao;
-        this.licAtual = licAtual;
         this.iniciador = iniciador.clone();
+        this.licitadores = new ArrayList<>();
     }
     
     public String getDescricao(){
@@ -42,6 +46,19 @@ public class Leilao {
     
     public Vendedor getIniciador(){
         return this.iniciador.clone();
+    }
+    
+    public String getVencedor(){
+        return licitadores.get(licitadores.size()).getUsername();
+    }
+    
+    public ArrayList<Comprador> getLicitadores(){
+        return this.licitadores;
+    }
+    
+    public void licitar(Comprador c,double lic){
+        this.licAtual = lic;
+        licitadores.add(c);
     }
 
     public Leilao clone(){
