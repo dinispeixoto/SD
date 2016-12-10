@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sdtrabalho;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,5 +63,25 @@ public class GestorLeiloes {
             double lic = leiloes.get(idLeilao).getLicAtual();
             String venc = leiloes.get(idLeilao).getVencedor();
             return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");}
+    }
+
+    public String[] consultarLeiloes(Utilizador u){
+        String[] string = new String[(leiloes.size())];
+        int i=0;
+        for(Map.Entry<String,Leilao> entry : leiloes.entrySet()){
+            Leilao x = entry.getValue();
+            String a = entry.getKey();
+            if(x.getIniciador().equals(u)){
+                string[i] = "* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
+            }
+            else if(x.getVencedor().equals(u.getNome())){
+                string[i] = "+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
+            }
+            else{
+                string[i] = "ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
+            }
+            i++;
+        }
+        return string;
     }
 }

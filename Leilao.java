@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sdtrabalho;
 
 import java.util.ArrayList;
 
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 public class Leilao {
     private String descricao;
     private double licAtual;
-    private Vendedor iniciador;
+    private Utilizador iniciador;
     private ArrayList<Comprador> licitadores;
     
     public Leilao(){
@@ -30,7 +29,7 @@ public class Leilao {
     }
 
 
-    public Leilao(String descricao,Vendedor iniciador){
+    public Leilao(String descricao,Utilizador iniciador){
         this.descricao = descricao;
         this.iniciador = iniciador.clone();
         this.licitadores = new ArrayList<>();
@@ -44,7 +43,7 @@ public class Leilao {
         return this.licAtual;
     }
     
-    public Vendedor getIniciador(){
+    public Utilizador getIniciador(){
         return this.iniciador.clone();
     }
     

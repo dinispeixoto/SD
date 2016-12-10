@@ -56,6 +56,7 @@ public abstract class Utilizador{
     	string.append(this.password+'\n');
     	string.append("Username: ");
     	string.append(this.username+'\n');
+        return string.toString();
     }
 
     public boolean equals(Object obj){
@@ -67,7 +68,7 @@ public abstract class Utilizador{
         }
         Utilizador u = (Utilizador) obj;
         return u.getNome().equals(this.nome) && u.getUsername().equals(this.username)
-            && u.getPassword.equals(this.password);
+            && u.getPassword().equals(this.password);
 
     }
 
