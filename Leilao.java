@@ -48,7 +48,11 @@ public class Leilao {
     }
     
     public String getVencedor(){
-        return licitadores.get(licitadores.size()).getUsername();
+        String s = "Não existem licitadores!";
+        if(licitadores.size()!=0){
+            s = licitadores.get((licitadores.size())-1).getUsername();
+        }
+        return s;
     }
     
     public ArrayList<Comprador> getLicitadores(){

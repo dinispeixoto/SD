@@ -36,6 +36,7 @@ public class GestorLeiloes {
         else { Leilao lei = l.clone();
                String id = Integer.toString(idLeilao);
                leiloes.put(id,l);
+               System.out.println("coloquei leilao");
                idLeilao++;
                //((Vendedor)u).addLeilao(l);
         }
@@ -74,7 +75,7 @@ public class GestorLeiloes {
             if(x.getIniciador().equals(u)){
                 string[i] = "* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
             }
-            else if(x.getVencedor().equals(u.getNome())){
+            else if(x.getVencedor().equals(u.getUsername())){
                 string[i] = "+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
             }
             else{
