@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.ResourceBundle;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.*;
 
 public class Servidor{
 
@@ -11,17 +11,21 @@ public class Servidor{
 		Socket c = null;
 		int i=0;
 		GestorLeiloes g = new GestorLeiloes();
+		ReentrantLock lock = new ReentrantLock();
+		Condition cond = lock.newCondition();
+
 		
 		try{
 			s = new ServerSocket(8080);
 			System.out.println("Servidor inicializado!");
-			BufferedReader read_socket = new BufferedReader(new InputStreamReader(c.getInputStream()));
-			PrintWriter write_socket = new PrintWriter(c.getOutputStream(),true);
-
+			
 			while((c=s.accept()) != null){ 
 				System.out.println("Um cliente ligou-se!"); 
-				ThreadServidorRead tsr = new ThreadServidorRead(read_socket,g);
-				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket);
+				BufferedReader read_socket = new BufferedReader(new InputStreamReader(c.getInputStream()));
+				PrintWriter write_socket = new PrintWriter(c.getOutputStream(),true);
+				MensagemServidor ms = new MensagemServidor(cond);
+				ThreadServidorRead tsr = new ThreadServidorRead(read_socket,g,ms);
+				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket,cond,ms);
 				tsr.start();
 				tsw.start();
 			}

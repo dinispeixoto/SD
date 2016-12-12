@@ -17,7 +17,7 @@ public class GestorLeiloes {
         this.leiloes = new HashMap<>();
         this.utilizadores = new HashMap<>();
     }
-
+    
     public synchronized Utilizador iniciarSessao(String username, String password) throws UsernameInexistenteException, PasswordIncorretaException{
         if(this.utilizadores.containsKey(username)){
             throw new UsernameInexistenteException("Username inexistente!");

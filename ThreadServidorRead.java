@@ -6,11 +6,13 @@ public class ThreadServidorRead extends Thread{
 	private BufferedReader read_socket;
 	private GestorLeiloes g;
 	private Utilizador u;
+	private MensagemServidor ms;
 
-	public ThreadServidorRead(BufferedReader read_socket, GestorLeiloes g){
+	public ThreadServidorRead(BufferedReader read_socket, GestorLeiloes g, MensagemServidor ms){
 		this.read_socket = read_socket;
 		this.g = g;
 		this.u = null;
+		this.ms = ms;
 	}
 	
 	public void run(){
@@ -26,7 +28,7 @@ public class ThreadServidorRead extends Thread{
 						this.u = g.iniciarSessao(user,pass);
 					}
 					catch(Exception e){
-						//enivar para a outra thread
+						ms.setMsg(e.getMessage());
 					}
 				}
 				else if(input.equals("registar_comprador")){					
@@ -38,7 +40,7 @@ public class ThreadServidorRead extends Thread{
 						g.registarUtilizador(user,pass,0);
 					}
 					catch(Exception e){
-						//enivar para a outra thread
+						ms.setMsg(e.getMessage());
 					}
 				}
 				else if(input.equals("registar_vendedor")){					
@@ -50,8 +52,48 @@ public class ThreadServidorRead extends Thread{
 						g.registarUtilizador(user,pass,1);
 					}
 					catch(Exception e){
-						//enivar para a outra thread
+						ms.setMsg(e.getMessage());
 					}
+				}
+				else if(input.equals("licitar")){					
+
+					try{
+						input=null;
+					}
+					catch(Exception e){
+						ms.setMsg(e.getMessage());
+					}
+				}
+				else if(input.equals("iniciar_leilao")){					
+					
+					try{
+						input=null;	
+					}
+					catch(Exception e){
+						ms.setMsg(e.getMessage());
+					}
+				}
+				else if(input.equals("consultar")){					
+
+					try{
+						input=null;
+					}
+					catch(Exception e){
+						ms.setMsg(e.getMessage());
+					}
+				}
+				else if(input.equals("eliminar_leilao")){					
+					
+					try{
+						input=null;
+					}
+					catch(Exception e){
+						ms.setMsg(e.getMessage());
+					}
+				}
+				else if(input.equals("terminar_sessao")){					
+					this.u = null;
+					ms.setMsg("terminou sessao");
 				}
 			}
 		}
