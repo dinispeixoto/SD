@@ -18,6 +18,7 @@ public class ThreadClienteInput extends Thread{
 		String input = null;
 
 		try{
+			menu.showMenu();
 			while((input = ler_teclado.readLine())!= null){
 				if(menu.getOp() == 0){							// Não tem sessão iniciada
 					if(input.equals("1")){						// Iniciar sessão
@@ -85,6 +86,7 @@ public class ThreadClienteInput extends Thread{
 						break;
 					}			
 				}
+				menu.showMenu();
 			}
 		}
 		catch(Exception e){

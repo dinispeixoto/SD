@@ -9,7 +9,7 @@ public class Menu {
     private int op;
     
     /** Apresentar o menu */
-    private void showMenu() {
+    public void showMenu() {
         switch(op){
             case 0: System.out.println("1 - Iniciar Sessao\n2 - Registar como Comprador\n3 - Registar como Vendedor\n0 - Sair\n");
                     break;

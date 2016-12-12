@@ -26,6 +26,7 @@ public class ThreadServidorRead extends Thread{
 					
 					try{
 						this.u = g.iniciarSessao(user,pass);
+						ms.setMsg("Iniciou sessão como Comprador!");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
@@ -38,6 +39,7 @@ public class ThreadServidorRead extends Thread{
 
 					try{
 						g.registarUtilizador(user,pass,0);
+						ms.setMsg("Iniciou sessão como Vendedor!");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
@@ -50,6 +52,7 @@ public class ThreadServidorRead extends Thread{
 
 					try{
 						g.registarUtilizador(user,pass,1);
+						ms.setMsg("registado");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
@@ -93,7 +96,7 @@ public class ThreadServidorRead extends Thread{
 				}
 				else if(input.equals("terminar_sessao")){					
 					this.u = null;
-					ms.setMsg("terminou sessao");
+					ms.setMsg("Terminou sessão");
 				}
 			}
 		}

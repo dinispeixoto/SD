@@ -15,7 +15,7 @@ public class ThreadClienteOutput extends Thread{
 		try{
 			String linha;								
 			while((linha = ler_socket.readLine())!=null){
-				if(linha.equals("Iniciou sessão como Comprador")){
+				if(linha.equals("Iniciou sessão como Comprador!")){
 					menu.setOp(1);
 				}
 				else if(linha.equals("Iniciou sessão como Vendedor!")){

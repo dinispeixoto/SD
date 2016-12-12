@@ -23,9 +23,9 @@ public class Servidor{
 				System.out.println("Um cliente ligou-se!"); 
 				BufferedReader read_socket = new BufferedReader(new InputStreamReader(c.getInputStream()));
 				PrintWriter write_socket = new PrintWriter(c.getOutputStream(),true);
-				MensagemServidor ms = new MensagemServidor(cond);
+				MensagemServidor ms = new MensagemServidor(cond,lock);
 				ThreadServidorRead tsr = new ThreadServidorRead(read_socket,g,ms);
-				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket,cond,ms);
+				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket,cond,ms,lock);
 				tsr.start();
 				tsw.start();
 			}
