@@ -11,7 +11,7 @@ public class Comprador extends Utilizador {
 
     
     public Comprador(){
-        super("","","");
+        super("","");
         this.leiloes = new ArrayList<String>();
     }
 
@@ -22,28 +22,23 @@ public class Comprador extends Utilizador {
     }
 
 
-    public Comprador(String username, String password, String nome, ArrayList<String> leiloes){
-        super(username,password,nome);
+    public Comprador(String username, String password, ArrayList<String> leiloes){
+        super(username,password);
         this.leiloes = new ArrayList<String>();
         //if(leiloes!= null) this.setLeiloes(leiloes);
     }
-
-    
-    //public ArrayList<String> getLeiloes(){}
-       
-    //public void setLeiloes(ArrayList<String> leiloes){}
 
     public Comprador clone(){
         return new Comprador(this);
     }
 
-   public boolean equals(Object obj){
+    public boolean equals(Object obj){
       if(this == obj)
         return true;
       if ((obj==null) || (this.getClass() != obj.getClass()))
         return false;
       Comprador v = (Comprador) obj;
         return (super.equals(v)); /* falta equals de cada um dos imoveis caso seja necessário */
-   }
+    }
 
 }

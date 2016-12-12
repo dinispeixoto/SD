@@ -2,25 +2,20 @@ public abstract class Utilizador{
 
 	private String username;
 	private String password;
-	private String nome;
-
 
 	public Utilizador(){
 		this.username = "n/a";
 		this.password = "n/a";
-		this.nome = "n/a";
 	}
 
 	public Utilizador(Utilizador c) {
         this.username = c.getUsername();
         this.password = c.getPassword();
-        this.nome = c.getNome();
     }
 
-    public Utilizador(String username, String password, String nome){
+    public Utilizador(String username, String password){
     	this.username = username;
     	this.password = password;
-    	this.nome = nome;
     }
 
     public String getUsername(){
@@ -31,20 +26,12 @@ public abstract class Utilizador{
     	return this.password;
     }
 
-    public String getNome(){
-    	return this.nome;
-    }
-
     public void setUsername(String username){
     	this.username = username;
     }
 
     public void setPassword(String password){
     	this.password = password;
-    }
-
-    public void setNome(String nome){
-    	this.nome = nome;
     }
 
     public String toString(){

@@ -18,12 +18,19 @@ public class GestorLeiloes {
         this.utilizadores = new HashMap<>();
     }
     
-    public synchronized void registarUtilizador(Utilizador u) throws UsernameInvalidoException{
-        if(this.utilizadores.containsKey(u.getUsername())){
+    public synchronized void registarUtilizador(String user, String pass, int op) throws UsernameInvalidoException{
+        if(this.utilizadores.containsKey(user)){
                         throw new UsernameInvalidoException("Username já se encontra em uso!");
                     }
         else {
-            utilizadores.put(u.getUsername(),u);
+            switch(op){
+                case 0: Comprador c = new Comprador (user,pass,null);
+                        utilizadores.put(user,c);
+                        break;
+                case 1: Vendedor v = new Vendedor (user,pass,null);
+                        utilizadores.put(user,v);
+                        break;
+            }
         }
     }
     
