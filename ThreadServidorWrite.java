@@ -2,12 +2,12 @@ import java.lang.Thread;
 import java.io.*;
 import java.net.*;
 
-public class ThreadServidorRead extends Thread{
+public class ThreadServidorWrite extends Thread{
 	private BufferedReader write_socket;
 	private Condition c;
 	private Utilizador u;
 
-	public ThreadServidorRead(BufferedReader write_socket,Condition c){
+	public ThreadServidorWrite(BufferedReader write_socket,Condition c){
 		this.write_socket = write_socket;
 		this.g = g;
 	}

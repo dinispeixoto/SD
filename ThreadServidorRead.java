@@ -15,17 +15,17 @@ public class ThreadServidorRead extends Thread{
 	
 	public void run(){
 		try{
-			String linha;
-			while((linha = read_socket.readLine()) != null){ 
+			String input;
+			while((input = read_socket.readLine()) != null){ 
 				if(input.equals("iniciar_sessao")){						
 					String user,pass;
 					user = read_socket.readLine();
 					pass = read_socket.readLine();
 					
 					try{
-						this.u = g.iniciar_sessao(user,pass);
+						this.u = g.iniciarSessao(user,pass);
 					}
-					catch(){
+					catch(Exception e){
 						//enivar para a outra thread
 					}
 				}
@@ -37,7 +37,7 @@ public class ThreadServidorRead extends Thread{
 					try{
 						g.registarUtilizador(user,pass,0);
 					}
-					catch(){
+					catch(Exception e){
 						//enivar para a outra thread
 					}
 				}
@@ -49,7 +49,7 @@ public class ThreadServidorRead extends Thread{
 					try{
 						g.registarUtilizador(user,pass,1);
 					}
-					catch(){
+					catch(Exception e){
 						//enivar para a outra thread
 					}
 				}

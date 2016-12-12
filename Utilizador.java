@@ -37,8 +37,6 @@ public abstract class Utilizador{
     public String toString(){
     	StringBuilder string;
     	string = new StringBuilder();
-    	string.append("Nome: ");
-    	string.append(this.nome+'\n');
     	string.append("Password: ");
     	string.append(this.password+'\n');
     	string.append("Username: ");
@@ -54,7 +52,7 @@ public abstract class Utilizador{
             return false;
         }
         Utilizador u = (Utilizador) obj;
-        return u.getNome().equals(this.nome) && u.getUsername().equals(this.username)
+        return u.getUsername().equals(this.username)
             && u.getPassword().equals(this.password);
 
     }
