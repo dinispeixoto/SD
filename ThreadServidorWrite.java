@@ -23,6 +23,8 @@ public class ThreadServidorWrite extends Thread{
 			String linha;
 			c.await();
 			while((linha = ms.getMsg())!=null){
+				if(linha.equals("Sair"))
+					break;
 				this.write_socket.println(linha);
 				c.await();
 			}

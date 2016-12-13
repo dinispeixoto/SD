@@ -19,11 +19,11 @@ public class GestorLeiloes {
     }
     
     public synchronized Utilizador iniciarSessao(String username, String password) throws UsernameInexistenteException, PasswordIncorretaException{
-        if(this.utilizadores.containsKey(username)){
+        if(!this.utilizadores.containsKey(username)){
             throw new UsernameInexistenteException("Username inexistente!");
         }
         else{
-            if(this.utilizadores.get(username).getPassword().equals(password)){
+            if(!this.utilizadores.get(username).getPassword().equals(password)){
                 throw new PasswordIncorretaException("A password está incorreta!");
             }
             else{
@@ -40,7 +40,6 @@ public class GestorLeiloes {
             switch(op){
                 case 0: Comprador c = new Comprador (user,pass,null);
                         this.utilizadores.put(user,c);
-                        System.out.println("cheguei");
                         break;
                 case 1: Vendedor v = new Vendedor (user,pass,null);
                         this.utilizadores.put(user,v);

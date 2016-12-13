@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.ResourceBundle;
+import java.util.concurrent.locks.*;
 
 public class Cliente{
 
@@ -8,17 +10,18 @@ public class Cliente{
 		String input = null;
 		Utilizador utilizador = null;
 		Socket socket = null;
+		ReentrantLock lock = new ReentrantLock();
+		Condition cond = lock.newCondition();
 
 		try{
 
 			socket = new Socket("localhost",8080);
-			BufferedReader ler_teclado = new BufferedReader(new InputStreamReader(System.in)); 
-			BufferedReader ler_socket = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-			PrintWriter escrever_socket = new PrintWriter(socket.getOutputStream(),true);	
+			
+			BufferedReader ler_socket = new BufferedReader(new InputStreamReader(socket.getInputStream()));	
 
 			Menu menu = new Menu();
-			ThreadClienteInput tci = new ThreadClienteInput(ler_teclado,escrever_socket,menu);
-			ThreadClienteOutput tco = new ThreadClienteOutput(ler_socket,menu);
+			ThreadClienteInput tci = new ThreadClienteInput(socket,menu,lock, cond);
+			ThreadClienteOutput tco = new ThreadClienteOutput(ler_socket,menu,lock, cond);
 
 			tci.start();	
 			tco.start();
@@ -26,9 +29,7 @@ public class Cliente{
 			tci.join();
 			tco.join();
 
-			ler_teclado.close();
 			ler_socket.close();
-			escrever_socket.close();
 
 			System.out.println("Adeus!\n");
 			socket.close();

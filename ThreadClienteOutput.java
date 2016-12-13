@@ -1,14 +1,20 @@
 import java.lang.Thread;
 import java.io.*;
 import java.net.*;
+import java.util.ResourceBundle;
+import java.util.concurrent.locks.*;
 
 public class ThreadClienteOutput extends Thread{
 	private BufferedReader ler_socket;
 	private Menu menu;
+	private ReentrantLock lock; 
+	private Condition cond;
 
-	public ThreadClienteOutput(BufferedReader ler_socket, Menu menu){
+	public ThreadClienteOutput(BufferedReader ler_socket, Menu menu, ReentrantLock l, Condition c){
 		this.ler_socket = ler_socket;
 		this.menu = menu;
+		this.lock=l;
+		this.cond=c;
 	}
 	
 	public void run(){
@@ -17,16 +23,23 @@ public class ThreadClienteOutput extends Thread{
 			while((linha = ler_socket.readLine())!=null){
 				if(linha.equals("Iniciou sessão como Comprador!")){
 					menu.setOp(1);
+					this.lock.lock();
+					cond.signal();
+					this.lock.unlock();
 				}
 				else if(linha.equals("Iniciou sessão como Vendedor!")){
 					menu.setOp(2);
+					this.lock.lock();
+					cond.signal();
+					this.lock.unlock();
 				}
 				else if(linha.equals("Terminou sessão")){
 					menu.setOp(0);
+					this.lock.lock();
+					cond.signal();
+					this.lock.unlock();
 				}
-
 				System.out.println(linha);
-
 			}
 		}
 		catch(Exception e){

@@ -1,16 +1,29 @@
 import java.io.*;
 import java.net.*;
+import java.util.ResourceBundle;
+import java.util.concurrent.locks.*;
 
 public class ThreadClienteInput extends Thread{
 	
 	private BufferedReader ler_teclado;
 	private PrintWriter escrever_socket;
+	private Socket socket;
 	private Menu menu;
+	private ReentrantLock lock; 
+	private Condition c;
 
-	public ThreadClienteInput(BufferedReader b, PrintWriter p, Menu menu){
-		this.ler_teclado = b;
-		this.escrever_socket = p;
-		this.menu = menu;
+	public ThreadClienteInput(Socket socket, Menu menu, ReentrantLock l, Condition c){
+		try{
+			this.ler_teclado = new BufferedReader(new InputStreamReader(System.in)); 
+			this.escrever_socket = new PrintWriter(socket.getOutputStream(),true);
+			this.socket = socket; 
+			this.menu = menu;
+			this.lock = l;
+			this.c = c;
+		}
+		catch(IOException e){
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void run(){
@@ -23,32 +36,35 @@ public class ThreadClienteInput extends Thread{
 				if(menu.getOp() == 0){							// Não tem sessão iniciada
 					if(input.equals("1")){						// Iniciar sessão
 						escrever_socket.println("iniciar_sessao");
-						System.out.println("Username: ");
+						System.out.print("Username: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 
-						System.out.println("Password: ");
+						System.out.print("Password: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
-
+						
+						this.lock.lock();
+						c.await();
+						this.lock.unlock();
 					}
 					else if(input.equals("2")){					// Registar como comprador
 						escrever_socket.println("registar_comprador");
-						System.out.println("Username: ");
+						System.out.print("Username: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 
-						System.out.println("Password: ");
+						System.out.print("Password: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 					}
 					else if(input.equals("3")){					// Registar como vendedor
 						escrever_socket.println("registar_vendedor");
-						System.out.println("Username: ");
+						System.out.print("Username: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 
-						System.out.println("Password: ");
+						System.out.print("Password: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 					}
@@ -72,7 +88,7 @@ public class ThreadClienteInput extends Thread{
 				else if(menu.getOp() == 2){						// Vendedor logado.
 					if(input.equals("1")){						// Iniciar leilão
 						escrever_socket.println("iniciar_leilao");
-						System.out.println("Descrição: ");
+						System.out.print("Descrição: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
 					}
@@ -88,6 +104,7 @@ public class ThreadClienteInput extends Thread{
 				}
 				menu.showMenu();
 			}
+			socket.shutdownOutput();
 		}
 		catch(Exception e){
 			System.out.println(e.getMessage());
