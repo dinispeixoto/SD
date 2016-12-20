@@ -10,11 +10,11 @@ public class ThreadServidorWrite extends Thread{
 	private MensagemServidor ms;
 	private ReentrantLock lock;
 
-	public ThreadServidorWrite(PrintWriter write_socket, Condition c, MensagemServidor ms, ReentrantLock lock){
+	public ThreadServidorWrite(PrintWriter write_socket, MensagemServidor ms){
 		this.write_socket = write_socket;
-		this.c = c;
+		this.c = ms.getCondition();
 		this.ms = ms;
-		this.lock = lock;
+		this.lock = ms.getLock();
 	}
 	
 	public void run(){

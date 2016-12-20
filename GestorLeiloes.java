@@ -9,16 +9,19 @@ import java.util.concurrent.locks.*;
 public class GestorLeiloes {
     private Map<String,Leilao> leiloes;
     private Map<String,Utilizador> utilizadores;
+    private Map<String,MensagemServidor> mensagens;
     private int idLeilao=1;
-    private Condition c;
+    private ReentrantLock lock;
     
     
     public GestorLeiloes(){
         this.leiloes = new HashMap<>();
         this.utilizadores = new HashMap<>();
+        this.mensagens = new HashMap<>();
+        this.lock = new ReentrantLock();
     }
     
-    public synchronized Utilizador iniciarSessao(String username, String password) throws UsernameInexistenteException, PasswordIncorretaException{
+    public Utilizador iniciarSessao(String username, String password) throws UsernameInexistenteException, PasswordIncorretaException{
         if(!this.utilizadores.containsKey(username)){
             throw new UsernameInexistenteException("Username inexistente!");
         }
@@ -32,7 +35,7 @@ public class GestorLeiloes {
         }
     }
     
-    public synchronized void registarUtilizador(String user, String pass, int op) throws UsernameInvalidoException{
+    public void registarUtilizador(String user, String pass, int op, MensagemServidor ms) throws UsernameInvalidoException{
         if(this.utilizadores.containsKey(user)){
                         throw new UsernameInvalidoException("Username já se encontra em uso!");
         }
@@ -40,15 +43,17 @@ public class GestorLeiloes {
             switch(op){
                 case 0: Comprador c = new Comprador (user,pass,null);
                         this.utilizadores.put(user,c);
+                        this.mensagens.put(user,ms);
                         break;
                 case 1: Vendedor v = new Vendedor (user,pass,null);
                         this.utilizadores.put(user,v);
+                        this.mensagens.put(user,ms);
                         break;
             }
         }
     }
     
-    public synchronized String adicionarLeilao(Leilao l,Utilizador u) throws SemAutorizacaoException{
+    public String adicionarLeilao(Leilao l,Utilizador u) throws SemAutorizacaoException{
         if(u.getClass().getName().equals("Comprador")){
             throw new SemAutorizacaoException("Necessita de ser um Vendedor para iniciar um Leilão!");
         }
@@ -62,7 +67,7 @@ public class GestorLeiloes {
         return Integer.toString(idLeilao-1);
     }
     
-    public synchronized void licitarLeilao(String idLeilao,Utilizador u,double lic) throws SemAutorizacaoException, LeilaoInexistenteException, LicitacaoInvalidaException{
+    public void licitarLeilao(String idLeilao,Utilizador u,double lic) throws SemAutorizacaoException, LeilaoInexistenteException, LicitacaoInvalidaException{
         if(u.getClass().getName().equals("Vendedor")){
             throw new SemAutorizacaoException("Necessita de ser um Comprador para fazer uma licitação!");
         }
@@ -73,29 +78,11 @@ public class GestorLeiloes {
             throw new LicitacaoInvalidaException("Necessita de ser um Vendedor para iniciar um Leilão!");
         }
         else{
-
-            Leilao l = leiloes.get(idLeilao);
-            /*ReentrantLock rl = l.getLock();
-            this.c = l.getCondition();
-            rl.lock();
-            
-            try{*/
-                l.licitar((Comprador)u, lic);
-
-           /*     c.await();
-                
-            }
-            catch (InterruptedException e){
-                System.out.println("erro");
-            }
-            finally{
-                rl.unlock();
-            }*/
-
+            leiloes.get(idLeilao).licitar((Comprador)u, lic);
         }
     }
     
-    public synchronized String encerrarLeilao(String idLeilao,Utilizador u) throws SemAutorizacaoException, LeilaoInexistenteException{
+    public String encerrarLeilao(String idLeilao,Utilizador u) throws SemAutorizacaoException, LeilaoInexistenteException{
         if(u.getClass().getName().equals("Comprador")){
             throw new SemAutorizacaoException("Necessita de ser um Vendedor para encerrar um leilão!");
         }
@@ -109,10 +96,13 @@ public class GestorLeiloes {
             double lic = leiloes.get(idLeilao).getLicAtual();
             String venc = leiloes.get(idLeilao).getVencedor();
 
+            // buscar a lista de compradores
+            // correr o map das mensagens para mandar uma mensagem ao compradores respectivos
+
             return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");}
     }
 
-    public synchronized String[] consultarLeiloes(Utilizador u){
+    public String[] consultarLeiloes(Utilizador u){
         String[] string = new String[(leiloes.size())];
         int i=0;
         for(Map.Entry<String,Leilao> entry : leiloes.entrySet()){

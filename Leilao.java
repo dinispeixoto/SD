@@ -7,14 +7,10 @@ public class Leilao {
     private double licAtual;
     private Utilizador iniciador;
     private ArrayList<Comprador> licitadores;
-    private ReentrantLock lock;
-    private Condition c;
     
     public Leilao(){
         this("",null);
         this.licitadores = new ArrayList<>();
-        this.lock = new ReentrantLock();
-        this.c = lock.newCondition();
     }
 
     
@@ -51,17 +47,9 @@ public class Leilao {
         return this.licitadores;
     }
     
-    public void licitar(Comprador c,double lic){
+    public synchronized void licitar(Comprador c,double lic){
         this.licAtual = lic;
         licitadores.add(c);
-    }
-
-    public Condition getCondition(){
-        return this.c;
-    }
-
-    public ReentrantLock getLock(){
-        return this.lock;
     }
 
     public Leilao clone(){

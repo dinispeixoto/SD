@@ -76,6 +76,13 @@ public class ThreadClienteInput extends Thread{
 				else if(menu.getOp() == 1){						// Comprador logado.
 					if(input.equals("1")){						// Licitar 
 						escrever_socket.println("licitar");
+						System.out.print("ID-Leilao: ");
+						input = ler_teclado.readLine();
+						escrever_socket.println(input);
+
+						System.out.print("Valor: ");
+						input = ler_teclado.readLine();
+						escrever_socket.println(input);
 					}
 					else if(input.equals("2")){					// Consultar leilão
 						escrever_socket.println("consultar_leilao");
@@ -97,6 +104,9 @@ public class ThreadClienteInput extends Thread{
 					}
 					else if(input.equals("3")){					// Encerrar leilão
 						escrever_socket.println("encerrar_leilao");
+						System.out.print("ID-Leilao: ");
+						input = ler_teclado.readLine();
+						escrever_socket.println(input);
 					}
 					else if(input.equals("0")){					// Terminar sessão
 						break;

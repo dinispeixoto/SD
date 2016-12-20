@@ -3,22 +3,27 @@ import java.io.*;
 import java.net.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MensagemServidor {
-	private String mensagem;
+	private List<String> mensagem;
 	private Condition c;
 	private ReentrantLock lock;
+	private int index;
 
 	public MensagemServidor(Condition c, ReentrantLock lock){
 		this.mensagem=null;
 		this.c = c;
 		this.lock = lock;
+		this.index = 0;
 	}
 
 	public void setMsg(String msg){
 		this.lock.lock();
 		try{
-			this.mensagem = msg;
+			this.mensagem.add(msg);
+			this.index++;
 			c.signal();
 		}
 		finally{
@@ -27,6 +32,14 @@ public class MensagemServidor {
 	}
 
 	public String getMsg(){
-		return this.mensagem;
+		return this.mensagem.get(index-1);
+	}
+
+	public Condition getCondition(){
+		return this.c;
+	}
+
+	public ReentrantLock getLock(){
+		return this.lock;
 	}
 }

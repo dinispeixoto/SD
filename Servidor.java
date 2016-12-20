@@ -12,8 +12,6 @@ public class Servidor{
 		int i=0;
 		GestorLeiloes g = new GestorLeiloes();
 		ReentrantLock lock = new ReentrantLock();
-		Condition cond = lock.newCondition();
-
 		
 		try{
 			s = new ServerSocket(8080);
@@ -23,9 +21,12 @@ public class Servidor{
 				System.out.println("Um cliente ligou-se!"); 
 				BufferedReader read_socket = new BufferedReader(new InputStreamReader(c.getInputStream()));
 				PrintWriter write_socket = new PrintWriter(c.getOutputStream(),true);
+				
+				Condition cond = lock.newCondition();
 				MensagemServidor ms = new MensagemServidor(cond,lock);
+				
 				ThreadServidorRead tsr = new ThreadServidorRead(read_socket,g,ms);
-				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket,cond,ms,lock);
+				ThreadServidorWrite tsw = new ThreadServidorWrite(write_socket,ms);
 				tsr.start();
 				tsw.start();
 			}

@@ -13,7 +13,6 @@ public class ThreadServidorRead extends Thread{
 		this.g = g;
 		this.u = null;
 		this.ms = ms;
-
 	}
 	
 	public void run(){
@@ -41,7 +40,7 @@ public class ThreadServidorRead extends Thread{
 					pass = read_socket.readLine();
 
 					try{
-						g.registarUtilizador(user,pass,0);
+						g.registarUtilizador(user,pass,0,ms);
 						ms.setMsg("Registado");
 					}
 					catch(Exception e){
@@ -54,7 +53,7 @@ public class ThreadServidorRead extends Thread{
 					pass = read_socket.readLine();
 
 					try{
-						g.registarUtilizador(user,pass,1);
+						g.registarUtilizador(user,pass,1,ms);
 						ms.setMsg("Registado");
 					}
 					catch(Exception e){
@@ -62,36 +61,45 @@ public class ThreadServidorRead extends Thread{
 					}
 				}
 				else if(input.equals("licitar")){					
-
+					String idLeilao,valor;
+					idLeilao = read_socket.readLine();
+					valor = read_socket.readLine();
+					Double val = Double.parseDouble(valor);
 					try{
-						input=null;
+						g.licitarLeilao(idLeilao,u,val);
+						ms.setMsg("Licitou");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
 					}
 				}
 				else if(input.equals("iniciar_leilao")){					
-					
+					String descricao;
+					descricao = read_socket.readLine();
+					Leilao leilao = new Leilao(descricao,u);
 					try{
-						input=null;	
+						g.adicionarLeilao(leilao,u);
+						ms.setMsg("Leilao Iniciado");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
 					}
 				}
 				else if(input.equals("consultar")){					
-
 					try{
-						input=null;
+						g.consultarLeiloes(u);
+						ms.setMsg("Consultar");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
 					}
 				}
 				else if(input.equals("eliminar_leilao")){					
-					
+					String idLeilao;
+					idLeilao = read_socket.readLine();
 					try{
-						input=null;
+						g.encerrarLeilao(idLeilao,u);
+						ms.setMsg("Eliminou Leilao");
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
