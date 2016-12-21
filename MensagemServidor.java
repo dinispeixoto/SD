@@ -13,7 +13,7 @@ public class MensagemServidor {
 	private int index;
 
 	public MensagemServidor(Condition c, ReentrantLock lock){
-		this.mensagem=null;
+		this.mensagem = new ArrayList<>();
 		this.c = c;
 		this.lock = lock;
 		this.index = 0;

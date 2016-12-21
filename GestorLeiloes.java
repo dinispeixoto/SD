@@ -62,7 +62,6 @@ public class GestorLeiloes {
                String id = Integer.toString(idLeilao);
                leiloes.put(id,l);
                idLeilao++;
-               //((Vendedor)u).addLeilao(l);
         }
         return Integer.toString(idLeilao-1);
     }
@@ -96,8 +95,12 @@ public class GestorLeiloes {
             double lic = leiloes.get(idLeilao).getLicAtual();
             String venc = leiloes.get(idLeilao).getVencedor();
 
-            // buscar a lista de compradores
-            // correr o map das mensagens para mandar uma mensagem ao compradores respectivos
+            Leilao l = this.leiloes.get(idLeilao);
+
+            for(Comprador c : l.getLicitadores()){
+                String user = c.getUsername();
+                this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
+            }
 
             return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");}
     }

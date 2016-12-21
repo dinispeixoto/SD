@@ -39,7 +39,7 @@ public class ThreadClienteOutput extends Thread{
 					cond.signal();
 					this.lock.unlock();
 				}
-				System.out.println(linha);
+				System.out.println("\n"+linha+"\n");
 			}
 		}
 		catch(Exception e){
