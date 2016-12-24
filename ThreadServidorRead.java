@@ -98,8 +98,7 @@ public class ThreadServidorRead extends Thread{
 					String idLeilao;
 					idLeilao = read_socket.readLine();
 					try{
-						g.encerrarLeilao(idLeilao,u);
-						ms.setMsg("Encerrou Leilao");
+						ms.setMsg(g.encerrarLeilao(idLeilao,u));
 					}
 					catch(Exception e){
 						ms.setMsg(e.getMessage());
