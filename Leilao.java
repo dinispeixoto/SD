@@ -1,30 +1,40 @@
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.*;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 public class Leilao {
     private String descricao;
     private double licAtual;
     private Utilizador iniciador;
-    private ArrayList<Comprador> licitadores;
+    private String topo;
+    private Set<Comprador> licitadores;
+    private ReentrantLock lock;
     
     public Leilao(){
         this("",null);
-        this.licitadores = new ArrayList<>();
+        this.licitadores = new HashSet<>();
+        this.lock = new ReentrantLock(); 
+        this.topo = null;
     }
 
     
     public Leilao(Leilao l){
         this.descricao = l.getDescricao();
         this.iniciador = l.getIniciador();
-        this.licitadores = new ArrayList<>();
+        this.licitadores = new HashSet<>();
+        this.lock = new ReentrantLock(); 
+        this.topo = null;
     }
 
 
     public Leilao(String descricao,Utilizador iniciador){
         this.descricao = descricao;
         this.iniciador = iniciador.clone();
-        this.licitadores = new ArrayList<>();
+        this.licitadores = new HashSet<>();
+        this.lock = new ReentrantLock(); 
+        this.topo = null;
     }
     
     public synchronized String getDescricao(){
@@ -40,23 +50,30 @@ public class Leilao {
     }
     
     public synchronized String getVencedor(){
-        return licitadores.get(licitadores.size()-1).getUsername();
+        return this.topo;
     }
     
-    public synchronized ArrayList<Comprador> getLicitadores(){
+    public synchronized Set<Comprador> getLicitadores(){
         return this.licitadores;
     }
     
-    public synchronized void licitar(Comprador c,double lic){
-        this.licAtual = lic;
-        licitadores.add(c);
+    public void licitar(Comprador c,double lic){
+        this.lock.lock();
+        try{   
+            this.licAtual = lic;
+            this.topo = c.getUsername();
+            licitadores.add(c);
+        }
+        finally{
+            this.lock.unlock();
+        }
     }
 
     public Leilao clone(){
         return new Leilao(this);
     }
 
-   public boolean equals(Object obj){
+    public boolean equals(Object obj){
       if(this == obj)
         return true;
       if ((obj==null) || (this.getClass() != obj.getClass()))
@@ -65,6 +82,6 @@ public class Leilao {
         return (this.descricao.equals(l.getDescricao()) && 
                 this.licAtual==l.getLicAtual() &&
                 this.iniciador.equals(l.getIniciador()));
-   }
+    }
     
 }

@@ -23,7 +23,7 @@ public class MensagemServidor {
 		this.lock.lock();
 		try{
 			this.mensagem.add(msg);
-			this.index++;
+			//this.index++;
 			c.signal();
 		}
 		finally{
@@ -32,7 +32,7 @@ public class MensagemServidor {
 	}
 
 	public String getMsg(){
-		return this.mensagem.get(index-1);
+		return this.mensagem.get((index++));
 	}
 
 	public Condition getCondition(){

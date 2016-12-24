@@ -77,7 +77,14 @@ public class GestorLeiloes {
             throw new LicitacaoInvalidaException("Necessita de ser um Vendedor para iniciar um Leilão!");
         }
         else{
-            leiloes.get(idLeilao).licitar((Comprador)u, lic);
+            Leilao l = this.leiloes.get(idLeilao);
+            
+            String topo = l.getVencedor();
+            
+            l.licitar((Comprador)u, lic);
+            
+            if(topo != null)
+                this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€");
         }
     }
     
@@ -92,17 +99,19 @@ public class GestorLeiloes {
             throw new SemAutorizacaoException("Necessita de ser o iniciador de um leilão para o poder encerrar!");
         }
         else{
-            double lic = leiloes.get(idLeilao).getLicAtual();
-            String venc = leiloes.get(idLeilao).getVencedor();
-
             Leilao l = this.leiloes.get(idLeilao);
+
+            double lic = l.getLicAtual();
+            String venc = l.getVencedor();
 
             for(Comprador c : l.getLicitadores()){
                 String user = c.getUsername();
                 this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
             }
-
-            return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");}
+            if(venc != null)    
+                return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
+            else return("Nenhum Vencedor!");
+        }
     }
 
     public String[] consultarLeiloes(Utilizador u){
