@@ -21,7 +21,7 @@ public class ThreadServidorWrite extends Thread{
 		this.lock.lock();
 		try{
 			String linha;
-			c.await();
+			//c.await();
 			while(true){
 				while((linha = ms.getMsg())==null)
 					c.await();

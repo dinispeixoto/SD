@@ -28,7 +28,7 @@ public class GestorLeiloes {
         this.lock = new ReentrantLock();
     }
     
-    public Utilizador iniciarSessao(String username, String password) throws UsernameInexistenteException, PasswordIncorretaException{
+    public Utilizador iniciarSessao(String username, String password, MensagemServidor ms) throws UsernameInexistenteException, PasswordIncorretaException{
         if(!this.utilizadores.containsKey(username)){
             throw new UsernameInexistenteException("Username inexistente!");
         }
@@ -37,6 +37,14 @@ public class GestorLeiloes {
                 throw new PasswordIncorretaException("A password está incorreta!");
             }
             else{
+                if(this.mensagens.containsKey(username)){
+                    MensagemServidor m = this.mensagens.get(username);
+                    String linha;
+                    while((linha = m.getMsg())!=null){
+                        ms.setMsg(linha,null);
+                    }
+                    this.mensagens.put(username,ms);
+                }
                 return this.utilizadores.get(username);
             }
         }
@@ -67,17 +75,16 @@ public class GestorLeiloes {
     }
     
     public String adicionarLeilao(Leilao l,Utilizador u) throws SemAutorizacaoException{
+        if(u.getClass().getName().equals("Comprador")){
+            throw new SemAutorizacaoException("Necessita de ser um Vendedor para iniciar um Leilão!");
+        }
         this.lock.lock();
         try{
-            if(u.getClass().getName().equals("Comprador")){
-                throw new SemAutorizacaoException("Necessita de ser um Vendedor para iniciar um Leilão!");
-            }
-            else { 
-               Leilao lei = l.clone();
-               String id = Integer.toString(this.idLeilao);
-               leiloes.put(id,l);
-               this.idLeilao++;
-            }
+            Leilao lei = l.clone();
+            String id = Integer.toString(this.idLeilao);
+            leiloes.put(id,l);
+            this.idLeilao++;
+        
             return Integer.toString(idLeilao-1);
         }
         finally{
@@ -86,21 +93,22 @@ public class GestorLeiloes {
     }
     
     public void licitarLeilao(String idLeilao,Utilizador u,double lic) throws SemAutorizacaoException, LeilaoInexistenteException, LicitacaoInvalidaException{
-        if(u.getClass().getName().equals("Vendedor")){
-            throw new SemAutorizacaoException("Necessita de ser um Comprador para fazer uma licitação!");
-        }
-        else if(!(leiloes.containsKey(idLeilao))){
+        this.lock.lock();
+        try{
+            if(u.getClass().getName().equals("Vendedor")){
+                throw new SemAutorizacaoException("Necessita de ser um Comprador para fazer uma licitação!");
+            }
+            else if(!(leiloes.containsKey(idLeilao))){
                 throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
-        }
-        else if(leiloes.get(idLeilao).getLicAtual() > lic){
+            }
+            else if(leiloes.get(idLeilao).getLicAtual() > lic){
                 throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
-        }
-        else if(leiloes.get(idLeilao).getLicAtual() == lic){
+            }
+            else if(leiloes.get(idLeilao).getLicAtual() == lic){
                 throw new LicitacaoInvalidaException("Licitação com valor igual a última licitação!");
-        }
-        else{
-            this.lock.lock();
-            try{
+            }
+            else{
+           
                 Leilao l = this.leiloes.get(idLeilao);
         
                 String topo = l.getVencedor();
@@ -110,10 +118,10 @@ public class GestorLeiloes {
                 if(topo != null)
                     this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
             }
-            finally{
-                this.lock.unlock();
-            }
         }  
+        finally{
+            this.lock.unlock();
+        }
     }
     
     public String encerrarLeilao(String idLeilao,Utilizador u) throws SemAutorizacaoException, LeilaoInexistenteException{

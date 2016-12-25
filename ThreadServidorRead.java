@@ -25,7 +25,7 @@ public class ThreadServidorRead extends Thread{
 					pass = read_socket.readLine();
 					
 					try{
-						this.u = g.iniciarSessao(user,pass);
+						this.u = g.iniciarSessao(user,pass,ms);
 						if(u.getClass().getName().equals("Comprador"))
 							ms.setMsg("Iniciou sessão como Comprador!",null);
 						else ms.setMsg("Iniciou sessão como Vendedor!",null);
