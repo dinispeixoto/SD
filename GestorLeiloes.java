@@ -75,7 +75,7 @@ public class GestorLeiloes {
         else if(!(leiloes.containsKey(idLeilao))){
             throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
         }
-        else if(leiloes.get(idLeilao).getLicAtual() > lic){
+        else if(leiloes.get(idLeilao).getLicAtual() >= lic){
             throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
         }
         else{
