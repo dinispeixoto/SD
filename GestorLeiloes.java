@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.*;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class GestorLeiloes {
@@ -74,7 +76,7 @@ public class GestorLeiloes {
             throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
         }
         else if(leiloes.get(idLeilao).getLicAtual() > lic){
-            throw new LicitacaoInvalidaException("Necessita de ser um Vendedor para iniciar um Leilão!");
+            throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
         }
         else{
             Leilao l = this.leiloes.get(idLeilao);
@@ -84,7 +86,7 @@ public class GestorLeiloes {
             l.licitar((Comprador)u, lic);
             
             if(topo != null)
-                this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€");
+                this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
         }
     }
     
@@ -95,7 +97,7 @@ public class GestorLeiloes {
         else if(!(leiloes.containsKey(idLeilao))){
             throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
         }
-        else if(!(leiloes.get(idLeilao).getIniciador().equals(u))){
+        else if(!(leiloes.get(idLeilao).getIniciador().equals(u.getUsername()))){
             throw new SemAutorizacaoException("Necessita de ser o iniciador de um leilão para o poder encerrar!");
         }
         else{
@@ -106,7 +108,7 @@ public class GestorLeiloes {
 
             for(Comprador c : l.getLicitadores()){
                 String user = c.getUsername();
-                this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
+                this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!",null);
             }
             if(venc != null)    
                 return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
@@ -114,24 +116,28 @@ public class GestorLeiloes {
         }
     }
 
-    public String[] consultarLeiloes(Utilizador u){
-        String[] string = new String[(leiloes.size())];
-        int i=0;
+    public ArrayList<String> consultarLeiloes(Utilizador u){
+        StringBuilder string;
+        string = new StringBuilder();
+        ArrayList<String> lista = new ArrayList<>();
         for(Map.Entry<String,Leilao> entry : leiloes.entrySet()){
             Leilao x = entry.getValue();
             String a = entry.getKey();
-            if(x.getIniciador().equals(u)){
-                string[i] = "* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
+
+            if(x.getIniciador().equals(u.getUsername())){
+                string.append("* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
             }
-            else if(x.getVencedor().equals(u.getUsername())){
-                string[i] = "+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
-            }
+            else if(x.getVencedor()!= null && x.getVencedor().equals(u.getUsername())){
+                    string.append("+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
+                }
             else{
-                string[i] = "ID-Leilão = "+a+" - Descrição: "+x.getDescricao();
+                string.append("ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
             }
-            i++;
+            
         }
-        return string;
+        lista.add("Consultar");
+        lista.add(string.toString());
+        return lista;
     }
 
     public Map<String,Utilizador> getUtilizadores (){

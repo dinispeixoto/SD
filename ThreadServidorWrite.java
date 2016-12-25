@@ -22,11 +22,12 @@ public class ThreadServidorWrite extends Thread{
 		try{
 			String linha;
 			c.await();
-			while((linha = ms.getMsg())!=null){
+			while(true){
+				while((linha = ms.getMsg())==null)
+					c.await();
 				if(linha.equals("Sair"))
 					break;
 				this.write_socket.println(linha);
-				c.await();
 			}
 		}
 		catch(Exception e){

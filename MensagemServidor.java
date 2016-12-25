@@ -19,10 +19,15 @@ public class MensagemServidor {
 		this.index = 0;
 	}
 
-	public void setMsg(String msg){
+	public void setMsg(String msg, ArrayList<String> lista){
 		this.lock.lock();
 		try{
-			this.mensagem.add(msg);
+			if(lista == null)
+				this.mensagem.add(msg);
+			else {
+				for(String m : lista)
+					this.mensagem.add(m);
+			}
 			//this.index++;
 			c.signal();
 		}
@@ -32,7 +37,9 @@ public class MensagemServidor {
 	}
 
 	public String getMsg(){
-		return this.mensagem.get((index++));
+		if(index!=mensagem.size())
+			return this.mensagem.get((index++));
+		else return null;
 	}
 
 	public Condition getCondition(){

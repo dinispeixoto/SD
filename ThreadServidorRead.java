@@ -27,11 +27,11 @@ public class ThreadServidorRead extends Thread{
 					try{
 						this.u = g.iniciarSessao(user,pass);
 						if(u.getClass().getName().equals("Comprador"))
-							ms.setMsg("Iniciou sessão como Comprador!");
-						else ms.setMsg("Iniciou sessão como Vendedor!");
+							ms.setMsg("Iniciou sessão como Comprador!",null);
+						else ms.setMsg("Iniciou sessão como Vendedor!",null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("registar_comprador")){					
@@ -41,10 +41,10 @@ public class ThreadServidorRead extends Thread{
 
 					try{
 						g.registarUtilizador(user,pass,0,ms);
-						ms.setMsg("Registado");
+						ms.setMsg("Registado",null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("registar_vendedor")){					
@@ -54,10 +54,10 @@ public class ThreadServidorRead extends Thread{
 
 					try{
 						g.registarUtilizador(user,pass,1,ms);
-						ms.setMsg("Registado");
+						ms.setMsg("Registado",null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("licitar")){					
@@ -67,10 +67,10 @@ public class ThreadServidorRead extends Thread{
 					Double val = Double.parseDouble(valor);
 					try{
 						g.licitarLeilao(idLeilao,u,val);
-						ms.setMsg("Licitou");
+						ms.setMsg("Licitou",null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("iniciar_leilao")){					
@@ -79,38 +79,37 @@ public class ThreadServidorRead extends Thread{
 					Leilao leilao = new Leilao(descricao,u);
 					try{
 						g.adicionarLeilao(leilao,u);
-						ms.setMsg("Leilao Iniciado");
+						ms.setMsg("Leilao Iniciado",null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
-				else if(input.equals("consultar")){					
+				else if(input.equals("consultar_leilao")){					
 					try{
-						g.consultarLeiloes(u);
-						ms.setMsg("Consultar");
+						ms.setMsg(null,g.consultarLeiloes(u));	
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("encerrar_leilao")){					
 					String idLeilao;
 					idLeilao = read_socket.readLine();
 					try{
-						ms.setMsg(g.encerrarLeilao(idLeilao,u));
+						ms.setMsg(g.encerrarLeilao(idLeilao,u),null);
 					}
 					catch(Exception e){
-						ms.setMsg(e.getMessage());
+						ms.setMsg(e.getMessage(),null);
 					}
 				}
 				else if(input.equals("terminar_sessao")){					
 					this.u = null;
-					ms.setMsg("Terminou sessão");
+					ms.setMsg("Terminou sessão",null);
 				}
 			}
 			read_socket.close();
-			ms.setMsg("Sair");
+			ms.setMsg("Sair",null);
 		}
 		catch(Exception e){
 			System.out.println(e.getMessage());

@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class Leilao {
     private String descricao;
     private double licAtual;
-    private Utilizador iniciador;
+    private String iniciador;
     private String topo;
     private Set<Comprador> licitadores;
     private ReentrantLock lock;
@@ -31,29 +31,29 @@ public class Leilao {
 
     public Leilao(String descricao,Utilizador iniciador){
         this.descricao = descricao;
-        this.iniciador = iniciador.clone();
+        this.iniciador = iniciador.getUsername();
         this.licitadores = new HashSet<>();
         this.lock = new ReentrantLock(); 
         this.topo = null;
     }
     
-    public synchronized String getDescricao(){
+    public String getDescricao(){
         return this.descricao;
     }
     
-    public synchronized double getLicAtual(){
+    public double getLicAtual(){
         return this.licAtual;
     }
     
-    public synchronized Utilizador getIniciador(){
-        return this.iniciador.clone();
+    public String getIniciador(){
+        return this.iniciador;
     }
     
-    public synchronized String getVencedor(){
+    public String getVencedor(){
         return this.topo;
     }
     
-    public synchronized Set<Comprador> getLicitadores(){
+    public Set<Comprador> getLicitadores(){
         return this.licitadores;
     }
     

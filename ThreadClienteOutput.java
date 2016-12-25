@@ -39,6 +39,10 @@ public class ThreadClienteOutput extends Thread{
 					cond.signal();
 					this.lock.unlock();
 				}
+				else if(linha.equals("Consultar")){
+					String s = ler_socket.readLine();
+					linha = s.replaceAll("(?i)[_]+", "\n");
+				}
 				System.out.println("\n"+linha+"\n");
 			}
 		}
