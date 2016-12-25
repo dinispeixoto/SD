@@ -9,10 +9,15 @@ import java.util.ArrayList;
 
 
 public class GestorLeiloes {
+    /*Map com os diversos leiloes activos*/
     private Map<String,Leilao> leiloes;
+    /*Map com todos os utilizadores registados*/
     private Map<String,Utilizador> utilizadores;
+    /*Map com todas as caixas de mensagem de cada utilizador*/
     private Map<String,MensagemServidor> mensagens;
+    /*ID inicial do leilao*/
     private int idLeilao=1;
+    /*Lock para prevenir exclusao mutua*/
     private ReentrantLock lock;
     
     
@@ -38,34 +43,46 @@ public class GestorLeiloes {
     }
     
     public void registarUtilizador(String user, String pass, int op, MensagemServidor ms) throws UsernameInvalidoException{
-        if(this.utilizadores.containsKey(user)){
-                        throw new UsernameInvalidoException("Username já se encontra em uso!");
-        }
-        else {
-            switch(op){
-                case 0: Comprador c = new Comprador (user,pass,null);
+        this.lock.lock();
+        try{
+            if(this.utilizadores.containsKey(user)){
+                throw new UsernameInvalidoException("Username já se encontra em uso!");
+            }
+            else {
+                switch(op){
+                    case 0: Comprador c = new Comprador (user,pass,null);
                         this.utilizadores.put(user,c);
                         this.mensagens.put(user,ms);
                         break;
-                case 1: Vendedor v = new Vendedor (user,pass,null);
+                    case 1: Vendedor v = new Vendedor (user,pass,null);
                         this.utilizadores.put(user,v);
                         this.mensagens.put(user,ms);
                         break;
-            }
+                }
+            } 
+        }
+        finally{
+            this.lock.unlock();
         }
     }
     
     public String adicionarLeilao(Leilao l,Utilizador u) throws SemAutorizacaoException{
-        if(u.getClass().getName().equals("Comprador")){
-            throw new SemAutorizacaoException("Necessita de ser um Vendedor para iniciar um Leilão!");
-        }
-        else { 
+        this.lock.lock();
+        try{
+            if(u.getClass().getName().equals("Comprador")){
+                throw new SemAutorizacaoException("Necessita de ser um Vendedor para iniciar um Leilão!");
+            }
+            else { 
                Leilao lei = l.clone();
-               String id = Integer.toString(idLeilao);
+               String id = Integer.toString(this.idLeilao);
                leiloes.put(id,l);
-               idLeilao++;
+               this.idLeilao++;
+            }
+            return Integer.toString(idLeilao-1);
         }
-        return Integer.toString(idLeilao-1);
+        finally{
+            this.lock.unlock();
+        }
     }
     
     public void licitarLeilao(String idLeilao,Utilizador u,double lic) throws SemAutorizacaoException, LeilaoInexistenteException, LicitacaoInvalidaException{
@@ -73,21 +90,30 @@ public class GestorLeiloes {
             throw new SemAutorizacaoException("Necessita de ser um Comprador para fazer uma licitação!");
         }
         else if(!(leiloes.containsKey(idLeilao))){
-            throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
+                throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
         }
-        else if(leiloes.get(idLeilao).getLicAtual() >= lic){
-            throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
+        else if(leiloes.get(idLeilao).getLicAtual() > lic){
+                throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
+        }
+        else if(leiloes.get(idLeilao).getLicAtual() == lic){
+                throw new LicitacaoInvalidaException("Licitação com valor igual a última licitação!");
         }
         else{
-            Leilao l = this.leiloes.get(idLeilao);
+            this.lock.lock();
+            try{
+                Leilao l = this.leiloes.get(idLeilao);
+        
+                String topo = l.getVencedor();
             
-            String topo = l.getVencedor();
+                l.licitar((Comprador)u, lic);
             
-            l.licitar((Comprador)u, lic);
-            
-            if(topo != null)
-                this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
-        }
+                if(topo != null)
+                    this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
+            }
+            finally{
+                this.lock.unlock();
+            }
+        }  
     }
     
     public String encerrarLeilao(String idLeilao,Utilizador u) throws SemAutorizacaoException, LeilaoInexistenteException{
@@ -101,18 +127,25 @@ public class GestorLeiloes {
             throw new SemAutorizacaoException("Necessita de ser o iniciador de um leilão para o poder encerrar!");
         }
         else{
-            Leilao l = this.leiloes.get(idLeilao);
+            this.lock.lock();
+            try{
+                Leilao l = this.leiloes.remove(idLeilao);
 
-            double lic = l.getLicAtual();
-            String venc = l.getVencedor();
+                double lic = l.getLicAtual();
+                String venc = l.getVencedor();
 
-            for(Comprador c : l.getLicitadores()){
-                String user = c.getUsername();
-                this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!",null);
+                for(Comprador c : l.getLicitadores()){
+                    String user = c.getUsername();
+                    this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!",null);
+                }
+
+                if(venc != null)    
+                    return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
+                else return("Nenhum Vencedor!");
             }
-            if(venc != null)    
-                return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
-            else return("Nenhum Vencedor!");
+            finally{
+                this.lock.unlock();
+            }
         }
     }
 
@@ -140,7 +173,7 @@ public class GestorLeiloes {
         return lista;
     }
 
-    public Map<String,Utilizador> getUtilizadores (){
+    public Map<String,Utilizador> getUtilizadores(){
         return this.utilizadores;
     }
 }

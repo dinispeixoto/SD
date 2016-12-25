@@ -28,7 +28,6 @@ public class MensagemServidor {
 				for(String m : lista)
 					this.mensagem.add(m);
 			}
-			//this.index++;
 			c.signal();
 		}
 		finally{
@@ -37,9 +36,15 @@ public class MensagemServidor {
 	}
 
 	public String getMsg(){
-		if(index!=mensagem.size())
-			return this.mensagem.get((index++));
-		else return null;
+		this.lock.lock();
+		try{
+			if(index!=mensagem.size())
+				return this.mensagem.get((index++));
+			else return null;
+		}
+		finally{
+			this.lock.unlock();
+		}
 	}
 
 	public Condition getCondition(){

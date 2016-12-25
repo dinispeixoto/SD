@@ -42,7 +42,13 @@ public class Leilao {
     }
     
     public double getLicAtual(){
-        return this.licAtual;
+        this.lock.lock();
+        try{
+            return this.licAtual;
+        }
+        finally{
+            this.lock.unlock();
+        }
     }
     
     public String getIniciador(){
@@ -50,11 +56,23 @@ public class Leilao {
     }
     
     public String getVencedor(){
-        return this.topo;
+        this.lock.lock();
+        try{
+            return this.topo;
+        }
+        finally{
+            this.lock.unlock();
+        }
     }
     
     public Set<Comprador> getLicitadores(){
-        return this.licitadores;
+        this.lock.lock();
+        try{
+            return this.licitadores;
+        }
+        finally{
+            this.lock.unlock();
+        }
     }
     
     public void licitar(Comprador c,double lic){

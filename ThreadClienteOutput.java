@@ -33,7 +33,7 @@ public class ThreadClienteOutput extends Thread{
 					cond.signal();
 					this.lock.unlock();
 				}
-				else if(linha.equals("Terminou sessão")){
+				else if(linha.equals("Terminou sessão") || linha.equals("Username inexistente!") || linha.equals("A password está incorreta!")){
 					menu.setOp(0);
 					this.lock.lock();
 					cond.signal();
@@ -41,7 +41,9 @@ public class ThreadClienteOutput extends Thread{
 				}
 				else if(linha.equals("Consultar")){
 					String s = ler_socket.readLine();
-					linha = s.replaceAll("(?i)[_]+", "\n");
+					if(s.length()==0)
+						linha = "Nenhum leilão aberto.";
+					else linha = s.replaceAll("(?i)[_]+", "\n");
 				}
 				System.out.println("\n"+linha+"\n");
 			}
