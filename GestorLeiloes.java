@@ -19,6 +19,7 @@ public class GestorLeiloes {
     private int idLeilao=1;
     /*Locks para tratar da concorrencia*/
     private ReentrantLock leiloesLock;
+    private ReentrantLock mensagensLock;
     private ReentrantLock usersLock;
     
     public GestorLeiloes(){
@@ -26,6 +27,7 @@ public class GestorLeiloes {
         this.utilizadores = new HashMap<>();
         this.mensagens = new HashMap<>();
         this.leiloesLock = new ReentrantLock();
+        this.mensagensLock = new ReentrantLock();
         this.usersLock = new ReentrantLock();
     }
     
@@ -35,22 +37,32 @@ public class GestorLeiloes {
             if(!this.utilizadores.containsKey(username)){
                 throw new UsernameInexistenteException("Username inexistente!");
             }
-            else{
-                if(!this.utilizadores.get(username).getPassword().equals(password)){
+            else if(!this.utilizadores.get(username).getPassword().equals(password)){
                     throw new PasswordIncorretaException("A password está incorreta!");
-                }
-                else{
-                    if(this.mensagens.containsKey(username)){
-                        MensagemServidor m = this.mensagens.get(username);
-                        String linha;
-                        while((linha = m.getMsg())!=null){
-                            ms.setMsg(linha,null);
-                        }
-                        this.mensagens.put(username,ms);
-                    }
-                    return this.utilizadores.get(username);
-                }
             }
+        }
+        finally{
+            this.usersLock.unlock();
+        }
+        
+        this.mensagensLock.lock();
+        try{
+            if(this.mensagens.containsKey(username)){
+                MensagemServidor m = this.mensagens.get(username);
+                String linha;
+                while((linha = m.getMsg())!=null){
+                    ms.setMsg(linha,null);
+                }
+                this.mensagens.put(username,ms);
+            }
+        }
+        finally{
+            this.mensagensLock.unlock();
+        }
+        
+        this.usersLock.lock();
+        try{
+            return this.utilizadores.get(username);
         }
         finally{
             this.usersLock.unlock();
@@ -66,13 +78,21 @@ public class GestorLeiloes {
             else {
                 switch(op){
                     case 0: Comprador c = new Comprador (user,pass,null);
-                        this.utilizadores.put(user,c);
-                        this.mensagens.put(user,ms);
-                        break;
+                            this.utilizadores.put(user,c);
+                            this.mensagensLock.lock();
+                            try{
+                                this.mensagens.put(user,ms);
+                            }
+                            finally{this.mensagensLock.unlock();}
+                            break;
                     case 1: Vendedor v = new Vendedor (user,pass,null);
-                        this.utilizadores.put(user,v);
-                        this.mensagens.put(user,ms);
-                        break;
+                            this.utilizadores.put(user,v);
+                            this.mensagensLock.lock();
+                            try{
+                                this.mensagens.put(user,ms);
+                            }
+                            finally{this.mensagensLock.unlock();}
+                            break;
                 }
             } 
         }
@@ -100,6 +120,8 @@ public class GestorLeiloes {
     }
     
     public void licitarLeilao(String idLeilao,Utilizador u,double lic) throws SemAutorizacaoException, LeilaoInexistenteException, LicitacaoInvalidaException{
+        Leilao l;
+        
         if(u.getClass().getName().equals("Vendedor")){
                 throw new SemAutorizacaoException("Necessita de ser um Comprador para fazer uma licitação!");
         }
@@ -108,30 +130,44 @@ public class GestorLeiloes {
             if(!(leiloes.containsKey(idLeilao))){
                 throw new LeilaoInexistenteException("Não existe nenhum leilão com tal ID!");
             }
-            else if(leiloes.get(idLeilao).getLicAtual() > lic){
-                throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
-            }
-            else if(leiloes.get(idLeilao).getLicAtual() == lic){
-                throw new LicitacaoInvalidaException("Licitação com valor igual a última licitação!");
-            }
-            else{
-           
-                Leilao l = this.leiloes.get(idLeilao);
-        
-                String topo = l.getVencedor();
             
-                l.licitar((Comprador)u, lic);
-            
-                if(topo != null && topo != u.getUsername())
-                    this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
-            }
+            l = this.leiloes.get(idLeilao);
         }  
         finally{
             this.leiloesLock.unlock();
         }
+        
+        String topo;
+        l.getLock().lock();
+        try{
+            if(l.getLicAtual() > lic){
+                throw new LicitacaoInvalidaException("Licitação com valor inferior a última licitação!");
+            }
+            else if(l.getLicAtual() == lic){
+                throw new LicitacaoInvalidaException("Licitação com valor igual a última licitação!");
+            }
+                
+            topo = l.getVencedor();
+            l.licitar((Comprador)u, lic);
+        }
+        finally{
+            l.getLock().unlock();
+        }
+        
+        if(topo != null && topo != u.getUsername()){
+            MensagemServidor m;
+            this.mensagensLock.lock();
+            try{
+                m = this.mensagens.get(topo);}
+            finally{this.mensagensLock.unlock();}
+           
+            m.setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);   
+        }
     }
     
     public String encerrarLeilao(String idLeilao,Utilizador u) throws SemAutorizacaoException, LeilaoInexistenteException{
+        Leilao l;
+
         if(u.getClass().getName().equals("Comprador")){
             throw new SemAutorizacaoException("Necessita de ser um Vendedor para encerrar um leilão!");
         }
@@ -143,25 +179,38 @@ public class GestorLeiloes {
             else if(!(leiloes.get(idLeilao).getIniciador().equals(u.getUsername()))){
                 throw new SemAutorizacaoException("Necessita de ser o iniciador de um leilão para o poder encerrar!");
             }
-            else{
-                Leilao l = this.leiloes.remove(idLeilao);
-
-                double lic = l.getLicAtual();
-                String venc = l.getVencedor();
-
-                for(Comprador c : l.getLicitadores()){
-                    String user = c.getUsername();
-                    this.mensagens.get(user).setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!",null);
-                }
-
-                if(venc != null)    
-                    return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
-                else return("Nenhum Vencedor!");
-            }
+                
+            l = this.leiloes.remove(idLeilao);
         }
         finally{
             this.leiloesLock.unlock();
         }
+
+        double lic;
+        String venc; 
+        MensagemServidor m;
+
+        l.getLock().lock();
+        try{
+            lic = l.getLicAtual();
+            venc = l.getVencedor();
+
+            for(Comprador c : l.getLicitadores()){
+                String user = c.getUsername();
+                this.mensagensLock.lock();
+                try{
+                    m = this.mensagens.get(user);}
+                finally{this.mensagensLock.unlock();}
+                
+                m.setMsg("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!",null);
+            }
+        }
+        finally{
+            l.getLock().unlock();
+        }
+        if(venc != null)    
+           return("O leilao "+idLeilao+" foi encerrado com o valor de "+lic+"€, ganho por "+venc+"!");
+        else return("Nenhum Vencedor!");   
     }
 
     public ArrayList<String> consultarLeiloes(Utilizador u){
@@ -173,17 +222,22 @@ public class GestorLeiloes {
             for(Map.Entry<String,Leilao> entry : leiloes.entrySet()){
                 Leilao x = entry.getValue();
                 String a = entry.getKey();
-
-                if(x.getIniciador().equals(u.getUsername())){
-                    string.append("* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
-                }
-                else if(x.getVencedor()!= null && x.getVencedor().equals(u.getUsername())){
-                        string.append("+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
+                
+                x.getLock().lock();
+                try{
+                    if(x.getIniciador().equals(u.getUsername())){
+                        string.append("* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
                     }
-                else{
-                    string.append("ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
+                    else if(x.getVencedor()!= null && x.getVencedor().equals(u.getUsername())){
+                            string.append("+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
+                        }
+                    else{
+                        string.append("ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Ult. Licitação: "+x.getLicAtual()+"_");
+                    }
                 }
-            
+                finally{
+                    x.getLock().unlock();
+                }
             }
         }
         finally{
@@ -194,7 +248,4 @@ public class GestorLeiloes {
         return lista;
     }
 
-    public Map<String,Utilizador> getUtilizadores(){
-        return this.utilizadores;
-    }
 }
