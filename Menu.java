@@ -29,7 +29,7 @@ public class Menu {
             case 2: System.out.println("************* VENDEDOR ************\n"+
                                        "* 1 - Iniciar Leilao              *\n"+
                                        "* 2 - Consultar Leiloes           *\n"+
-                                       "* 3 - Encerrar Leiloes            *\n"+
+                                       "* 3 - Encerrar Leilao             *\n"+
                                        "* m - Mostrar Menu                *\n"+
                                        "* 0 - Terminar Sessao             *\n"+
                                        "***********************************\n");

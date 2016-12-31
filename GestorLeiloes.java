@@ -19,20 +19,18 @@ public class GestorLeiloes {
     private int idLeilao=1;
     /*Locks para tratar da concorrencia*/
     private ReentrantLock leiloesLock;
-    private ReentrantLock mensagensLock;
-    private ReentrantLock registosLock;
+    private ReentrantLock usersLock;
     
     public GestorLeiloes(){
         this.leiloes = new HashMap<>();
         this.utilizadores = new HashMap<>();
         this.mensagens = new HashMap<>();
         this.leiloesLock = new ReentrantLock();
-        this.mensagensLock = new ReentrantLock();
-        this.registosLock = new ReentrantLock();
+        this.usersLock = new ReentrantLock();
     }
     
     public Utilizador iniciarSessao(String username, String password, MensagemServidor ms) throws UsernameInexistenteException, PasswordIncorretaException{
-        this.registosLock.lock();
+        this.usersLock.lock();
         try{
             if(!this.utilizadores.containsKey(username)){
                 throw new UsernameInexistenteException("Username inexistente!");
@@ -55,12 +53,12 @@ public class GestorLeiloes {
             }
         }
         finally{
-            this.registosLock.unlock();
+            this.usersLock.unlock();
         }
     }
     
     public void registarUtilizador(String user, String pass, int op, MensagemServidor ms) throws UsernameInvalidoException{
-        this.registosLock.lock();
+        this.usersLock.lock();
         try{
             if(this.utilizadores.containsKey(user)){
                 throw new UsernameInvalidoException("Username já se encontra em uso!");
@@ -79,7 +77,7 @@ public class GestorLeiloes {
             } 
         }
         finally{
-            this.registosLock.unlock();
+            this.usersLock.unlock();
         }
     }
     
@@ -124,7 +122,7 @@ public class GestorLeiloes {
             
                 l.licitar((Comprador)u, lic);
             
-                if(topo != null)
+                if(topo != null && topo != u.getUsername())
                     this.mensagens.get(topo).setMsg("No leilao "+idLeilao+" foi ultrapassado pelo "+u.getUsername()+", com o valor de "+lic+"€",null);
             }
         }  
