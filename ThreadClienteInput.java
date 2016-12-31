@@ -47,6 +47,7 @@ public class ThreadClienteInput extends Thread{
 						this.lock.lock();
 						c.await();
 						this.lock.unlock();
+						input="1";
 					}
 					else if(input.equals("2")){					// Registar como comprador
 						escrever_socket.println("registar_comprador");
@@ -57,6 +58,7 @@ public class ThreadClienteInput extends Thread{
 						System.out.print("Password: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
+						input="2";
 					}
 					else if(input.equals("3")){					// Registar como vendedor
 						escrever_socket.println("registar_vendedor");
@@ -67,12 +69,17 @@ public class ThreadClienteInput extends Thread{
 						System.out.print("Password: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
+						input="3";
 					}
 					else if(input.equals("0")){					// Sair
 						break;
 					}
+					if(input.equals("1") || input.equals("2") || input.equals("3") || input.equals("0") || input.equals("m")){ 
+						space();
+						menu.showMenu();
+					}
+					else System.out.println("Opção inválida.");
 				}
-
 				else if(menu.getOp() == 1){						// Comprador logado.
 					if(input.equals("1")){						// Licitar 
 						escrever_socket.println("licitar");
@@ -83,6 +90,7 @@ public class ThreadClienteInput extends Thread{
 						System.out.print("Valor: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
+						input="1";
 					}
 					else if(input.equals("2")){					// Consultar leilão
 						escrever_socket.println("consultar_leilao");
@@ -90,14 +98,19 @@ public class ThreadClienteInput extends Thread{
 					else if(input.equals("0")){					// Terminar sessão
 						break;
 					}
+					if(input.equals("1") || input.equals("2") || input.equals("0") || input.equals("m")){ 
+						space();
+						menu.showMenu();
+					}
+					else System.out.println("Opção inválida.");
 				}
-
 				else if(menu.getOp() == 2){						// Vendedor logado.
 					if(input.equals("1")){						// Iniciar leilão
 						escrever_socket.println("iniciar_leilao");
 						System.out.print("Descrição: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
+						input="1";
 					}
 					else if(input.equals("2")){					// Consultar
 						escrever_socket.println("consultar_leilao");
@@ -107,12 +120,17 @@ public class ThreadClienteInput extends Thread{
 						System.out.print("ID-Leilao: ");
 						input = ler_teclado.readLine();
 						escrever_socket.println(input);
+						input="3";
 					}
 					else if(input.equals("0")){					// Terminar sessão
 						break;
-					}			
+					}
+					if(input.equals("1") || input.equals("2") || input.equals("3") || input.equals("0") || input.equals("m")){ 
+						space();
+						menu.showMenu();		
+					}
+					else System.out.println("Opção inválida.");
 				}
-				menu.showMenu();
 			}
 			socket.shutdownOutput();
 		}
@@ -120,5 +138,10 @@ public class ThreadClienteInput extends Thread{
 			System.out.println(e.getMessage());
 		}
 
+	}
+
+	private void space(){
+		for(int i = 0;i<40;i++)
+			System.out.println();
 	}
 }

@@ -5,7 +5,6 @@ import java.util.concurrent.locks.*;
 
 public class Servidor{
 
-
 	static public void main (String[] args){
 		ServerSocket s;
 		Socket c = null;
@@ -15,10 +14,8 @@ public class Servidor{
 		
 		try{
 			s = new ServerSocket(8080);
-			System.out.println("Servidor inicializado!");
 			
 			while((c=s.accept()) != null){ 
-				System.out.println("Um cliente ligou-se!"); 
 				BufferedReader read_socket = new BufferedReader(new InputStreamReader(c.getInputStream()));
 				PrintWriter write_socket = new PrintWriter(c.getOutputStream(),true);
 				
