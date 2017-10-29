@@ -35,7 +35,7 @@ public class GestorLeiloes {
         this.usersLock.lock();
         try{
             if(!this.utilizadores.containsKey(username)){
-                throw new UsernameInexistenteException("Username inexistente!");
+                throw new UsernameInexistenteException("Username não existe!");
             }
             else if(!this.utilizadores.get(username).getPassword().equals(password)){
                     throw new PasswordIncorretaException("A password está incorreta!");
