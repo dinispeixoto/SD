@@ -31,7 +31,7 @@ public class Cliente{
 
 			ler_socket.close();
 
-			System.out.println("Adeus!\n");
+			System.out.println("Até uma próxima!\n");
 			socket.close();
 
 		}
