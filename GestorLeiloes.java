@@ -226,13 +226,13 @@ public class GestorLeiloes {
                 x.getLock().lock();
                 try{
                     if(x.getIniciador().equals(u.getUsername())){
-                        string.append("* "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Última Licitação: "+x.getLicAtual()+"_");
+                        string.append("* "+"#ID.Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Última Licitação: "+x.getLicAtual()+"_");
                     }
                     else if(x.getVencedor()!= null && x.getVencedor().equals(u.getUsername())){
-                            string.append("+ "+"ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Última Licitação: "+x.getLicAtual()+"_");
+                            string.append("+ "+"#ID.Leilão = "+a+" - Descrição: "+x.getDescricao()+" - Última Licitação: "+x.getLicAtual()+"_");
                         }
                     else{
-                        string.append("ID-Leilão = "+a+" - Descrição: "+x.getDescricao()+" -  Última Licitação: "+x.getLicAtual()+"_");
+                        string.append("#ID.Leilão = "+a+" - Descrição: "+x.getDescricao()+" -  Última Licitação: "+x.getLicAtual()+"_");
                     }
                 }
                 finally{
