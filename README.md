@@ -1,3 +1,3 @@
-# SD
+# Distributed Systems
 
-Trabalho para a UC Sistemas Distribuídos - Gestor de Leilões
+Distributed Systems project: Auctions management
